@@ -28,7 +28,9 @@ print("Duplicate data entries: \n",data[data.duplicated()==True])
 data = data.drop_duplicates(keep='first')
 print("After removing duplicate data, data shape is: ",data.shape)
 
-print("Basic info about data: \n",data.info())
+print("\nBasic info about data: \n")
+print("\n")
+print(data.info())
 print(data.describe())
 print("Number of null entries:\n",data.isna().sum())
 
@@ -51,12 +53,13 @@ data_vis = (X - X.mean()) / (X.std())              # standardization of data so 
 data_vis = pd.concat([y,data_vis],axis=1)
 data_vis = pd.melt(data_vis,id_vars="csMPa",var_name="features",value_name='value')
 
+print("Violin Plot of the data: ")
 plt.figure(figsize=(10,10))
 sns.violinplot(x="features", y="value", data=data_vis, inner="quart")#violinplot represents the distribution pattern of each of the features
 plt.xticks(rotation=45);
 plt.show()
 
-
+print("Box plot of the data: ")
 plt.figure(figsize=(10,10))
 sns.boxplot(x="features", y="value", data=data_vis)
 plt.xticks(rotation=45);
@@ -64,7 +67,7 @@ plt.show
 
 # #### To visualize individual  features' kernel density and pairwise scatter plots to look for correlation between different features.
 
-
+print("Kernel density and scatter plot of the data: ")
 plt.figure(figsize=(25,25))
 sns.set(style="white")
 df = X.loc[:,['cement','slag','flyash','water','superplasticizer','coarseaggregate','fineaggregate','age']]
@@ -74,14 +77,14 @@ g.map_diag(sns.kdeplot, lw=3);
 plt.show()
 
 # #### To view how related two features are we plot the heatmap which actually represents the correlation of two features.  Correlation of 1 represents very strong positive correlation and correlation of -1 represents very strong negative correlation.
-
+print("Heatmap of the data: ")
 f,ax = plt.subplots(figsize=(11, 11))
 sns.heatmap(df.corr(), annot=True, linewidths=.5, fmt= '.1f',ax=ax);
 plt.show()
 
 # #### Let us individually analyse the feature pair with the highest absolute value of correlation to check if the feature vectors are linearly dependent.
 
-
+print("Joint plot of water and superplasticizer columns: ")
 sns.jointplot(x = df.loc[:,'water'],
               y = df.loc[:,'superplasticizer'],
               kind="reg",
@@ -360,6 +363,7 @@ def mean_error(y_pred, y_actual, n): # to calculate root mean square error of th
 
 min_error=float("inf") #initialise the minimum error
 
+print("Random Sampling of data: ")
 for i in range(10): #repeat for 10 splits
     d = data.sample(frac = 1,random_state=42) #returns a randomly jumbles data
     
@@ -394,10 +398,15 @@ data_test_y = dataset_test.iloc[:,-1].values.reshape(-1,1) #extract test data ta
 train = [] #to store training errors
 test = [] #to store test error
 
+train = [] #to store training errors
+test = [] #to store test error
+nod = []#to store number of nodes
+
+print("Accuracy vs Depth and Number of nodes Analysis: ")
 for i in range(1,21):
-    regress_tree = RegressionTree(minimum_samples=3, max_depth=i)
+    regress_tree = RegressionTree(minimum_samples=1, max_depth=i)
     regress_tree.fit_model_depth(data_train_x,data_train_y)#train a tree of heights 1 to 30
-    
+    nod.append(num_nodes(regress_tree.root))
     y_pred_train = [regress_tree.predict(x,regress_tree.root) for x in data_train_x] #calculate training error
     train.append(mean_error(y_pred_train,data_train_y,data_train_x.shape[0]))
     
@@ -405,7 +414,8 @@ for i in range(1,21):
     test.append(mean_error(y_pred_test,data_test_y,data_test_x.shape[0]))
 
     
-
+    
+print("Error vs Depth plot: ")
 fig = plt.figure(figsize = (8,10))
 x = [i for i in range(1,21)] # plot how test and training error vary with depth of the tree
 plt.plot(x,train);
@@ -416,7 +426,17 @@ plt.title("Error vs Depth");
 plt.legend(['Train','Test']);
 plt.show()
 
+print("Error vs Number of Nodes plot: ")
+fig = plt.figure(figsize = (8,10))
+plt.plot(nod,train);
+plt.plot(nod,test);
+plt.xlabel("Number of Nodes");
+plt.ylabel("Root Mean Squared Error");
+plt.title("Error vs Number of nodes");
+plt.legend(['Train','Test']);
+plt.show()
 
+print("Optimal depth of tree: 15 ")
 fig = plt.figure(figsize = (8,10))
 x = [i for i in range(1,21)] # plot how test and training error vary with depth of the tree
 plt.plot(x,train);
@@ -451,21 +471,21 @@ X = dataset_test.iloc[:,:-1].values
 y = dataset_test.iloc[:,-1].values.reshape(-1,1)
 dataset = np.concatenate((X, y), axis=1)
 
+
+print("Error before pruning: ",mean_error(y_original,data_test_y,data_test_x.shape[0]))
+print("Number of nodes before pruning: ",num_nodes(regress_tree.root))
+
 d=[]
 err=[err]
 pruned = regress_tree.post_pruning(regress_tree.root,tree,err,d,dataset)
-
-
-print("Error before pruning: ",mean_error(y_original,data_test_y,data_test_x.shape[0]))
-
 y_pred_test = [regress_tree.predict(data = x,decision_tree=pruned) for x in data_test_x] 
 
 print("Error after pruning: ",mean_error(y_pred_test,data_test_y,data_test_x.shape[0]))
-
+print("Number of nodes after pruning: ",num_nodes(pruned))
 
 #plt.savefig('filename.jpg',bbox_inches='tight', dpi=300)
 
-
+print("Variation of Number of nodes with during pruning: ")
 nodes=[d[0]['num']] 
 err=[d[0]['error']]
 for x in d[1:]:
