@@ -57,13 +57,15 @@ print("Violin Plot of the data: ")
 plt.figure(figsize=(10,10))
 sns.violinplot(x="features", y="value", data=data_vis, inner="quart")#violinplot represents the distribution pattern of each of the features
 plt.xticks(rotation=45);
+plt.savefig('Violin_Plot.jpg',bbox_inches='tight', dpi=300)
 plt.show()
 
 print("Box plot of the data: ")
 plt.figure(figsize=(10,10))
 sns.boxplot(x="features", y="value", data=data_vis)
 plt.xticks(rotation=45);
-plt.show
+plt.savefig('Box_Plot.jpg',bbox_inches='tight', dpi=300)
+plt.show()
 
 # #### To visualize individual  features' kernel density and pairwise scatter plots to look for correlation between different features.
 
@@ -74,12 +76,15 @@ df = X.loc[:,['cement','slag','flyash','water','superplasticizer','coarseaggrega
 g = sns.PairGrid(df, diag_sharey=False,corner=True);
 g.map_lower(sns.regplot,scatter_kws={"color": "red"}, line_kws={"color": "black"});
 g.map_diag(sns.kdeplot, lw=3);
+plt.savefig('Kernel_Scatter_Plot.jpg',bbox_inches='tight', dpi=300)
 plt.show()
 
 # #### To view how related two features are we plot the heatmap which actually represents the correlation of two features.  Correlation of 1 represents very strong positive correlation and correlation of -1 represents very strong negative correlation.
 print("Heatmap of the data: ")
 f,ax = plt.subplots(figsize=(11, 11))
 sns.heatmap(df.corr(), annot=True, linewidths=.5, fmt= '.1f',ax=ax);
+
+plt.savefig('HeatMap.jpg',bbox_inches='tight', dpi=300)
 plt.show()
 
 # #### Let us individually analyse the feature pair with the highest absolute value of correlation to check if the feature vectors are linearly dependent.
@@ -89,6 +94,8 @@ sns.jointplot(x = df.loc[:,'water'],
               y = df.loc[:,'superplasticizer'],
               kind="reg",
               color="#ce1414",line_kws={"color": "black"});
+
+plt.savefig('JointPlot.jpg',bbox_inches='tight', dpi=300)
 plt.show()
 
 # ### Training the model
@@ -375,7 +382,7 @@ for i in range(10): #repeat for 10 splits
     d_test_x = d_test.iloc[:,:-1].values#set test data feature matrix
     d_test_y = d_test.iloc[:,-1].values.reshape(-1,1)#set test data output label
     
-    regress_tree = RegressionTree(minimum_samples=3)#construct a regression tree of depth 30(arbitarily large to allow best tree depending upon training set)
+    regress_tree = RegressionTree(minimum_samples=1)#construct a regression tree allow best tree depending upon training set
     regress_tree.fit_model(d_train_x,d_train_y)
     y_pred_train = [regress_tree.predict(x,regress_tree.root)  for x in d_train_x]#construct the predicted output variable vector
     
@@ -405,7 +412,7 @@ nod = []#to store number of nodes
 print("Accuracy vs Depth and Number of nodes Analysis: ")
 for i in range(1,21):
     regress_tree = RegressionTree(minimum_samples=1, max_depth=i)
-    regress_tree.fit_model_depth(data_train_x,data_train_y)#train a tree of heights 1 to 30
+    regress_tree.fit_model_depth(data_train_x,data_train_y)#train a tree of heights 1 to 20
     nod.append(num_nodes(regress_tree.root))
     y_pred_train = [regress_tree.predict(x,regress_tree.root) for x in data_train_x] #calculate training error
     train.append(mean_error(y_pred_train,data_train_y,data_train_x.shape[0]))
@@ -424,6 +431,8 @@ plt.xlabel("Depth");
 plt.ylabel("Root Mean Squared Error");
 plt.title("Error vs Depth");
 plt.legend(['Train','Test']);
+
+plt.savefig('Error_vs_depth.jpg',bbox_inches='tight', dpi=300)
 plt.show()
 
 print("Error vs Number of Nodes plot: ")
@@ -434,24 +443,27 @@ plt.xlabel("Number of Nodes");
 plt.ylabel("Root Mean Squared Error");
 plt.title("Error vs Number of nodes");
 plt.legend(['Train','Test']);
+
+plt.savefig('Error_vs_NumNodes.jpg',bbox_inches='tight', dpi=300)
 plt.show()
 
-print("Optimal depth of tree: 15 ")
+print("Optimal depth of tree: 9 ")
 fig = plt.figure(figsize = (8,10))
 x = [i for i in range(1,21)] # plot how test and training error vary with depth of the tree
 plt.plot(x,train);
 plt.plot(x,test);
-plt.plot(np.full((30,1),15),np.arange(0,30))
+plt.plot(np.full((30,1),9),np.arange(0,30))
 plt.xlabel("Depth");
 plt.ylabel("Mean Squared Error");
 plt.title("Error vs Depth");
-plt.legend(['Train','Test']);
+plt.legend(['Train','Test','Optimal Depth']);
+plt.savefig('Optimal_depth.jpg',bbox_inches='tight', dpi=300)
 plt.show()
 
-# #### We can clearly see the optimal depth of the tree should be around 15 but our present tree has depth 30 which leads to overfitting. The train error has reduced significantly but the tree fails to generalize well on unseen data. Thus, Post-pruning is required.
+# #### We can clearly see the optimal depth of the tree should be around 9 but our present tree has depth 20 which leads to overfitting. The train error has reduced significantly but the tree fails to generalize well on unseen data. Thus, Post-pruning is required.
 
-regress_tree = RegressionTree(minimum_samples=3)
-regress_tree.fit_model(data_train_x,data_train_y)#train a tree of heights 30
+regress_tree = RegressionTree(minimum_samples=1)
+regress_tree.fit_model(data_train_x,data_train_y)#train a tree 
         
 y_original = [regress_tree.predict(x,regress_tree.root) for x in data_test_x] #calculate test error
 err = mean_error(y_original,data_test_y,data_test_x.shape[0])
@@ -483,7 +495,12 @@ y_pred_test = [regress_tree.predict(data = x,decision_tree=pruned) for x in data
 print("Error after pruning: ",mean_error(y_pred_test,data_test_y,data_test_x.shape[0]))
 print("Number of nodes after pruning: ",num_nodes(pruned))
 
-#plt.savefig('filename.jpg',bbox_inches='tight', dpi=300)
+
+optimal_tree = RegressionTree(minimum_samples=1, max_depth=9)
+optimal_tree.fit_model_depth(data_train_x,data_train_y)
+print("Optimal number of nodes: ",num_nodes(optimal_tree.root))
+
+
 
 print("Variation of Number of nodes with during pruning: ")
 nodes=[d[0]['num']] 
