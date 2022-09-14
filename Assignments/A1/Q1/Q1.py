@@ -71,15 +71,16 @@ plt.show()
 # #### To visualize individual  features' kernel density and pairwise scatter plots to look for correlation between different features.
 
 #print("Kernel density and scatter plot of the data: ")
-plt.figure(figsize=(25,25))
+fig = plt.figure(figsize=(25,25))
 sns.set(style="white")
 df = X.loc[:,['cement','slag','flyash','water','superplasticizer','coarseaggregate','fineaggregate','age']]
 g = sns.PairGrid(df, diag_sharey=False,corner=True);
 g.map_lower(sns.regplot,scatter_kws={"color": "red"}, line_kws={"color": "black"});
 g.map_diag(sns.kdeplot, lw=3);
 plt.title("Kernel and Scatter Plot");
+plt.close(fig)
 plt.savefig('Kernel_Scatter_Plot.jpg',bbox_inches='tight', dpi=300)
-plt.show()
+
 
 # #### To view how related two features are we plot the heatmap which actually represents the correlation of two features.  Correlation of 1 represents very strong positive correlation and correlation of -1 represents very strong negative correlation.
 print("Heatmap of the data: ")
@@ -392,8 +393,10 @@ for i in range(10): #repeat for 10 splits
         min_error = mean_error(y_pred_train,d_train_y,d_train_x.shape[0]) #update current minima
         dataset_train = d_train#save the current training dataset
         dataset_test = d_test#save the current test set
+        best_tree = regress_tree
         
-
+print("Minimum training Error of the tree after random shuffling: ", min_error)
+print("height of the minimum training error tree :",find_height(best_tree.root))
 columns = data.iloc[:,:-1].columns #extract the columns of the training data
 print("columns of data are: ",columns)
 
@@ -449,7 +452,6 @@ plt.legend(['Train','Test']);
 plt.savefig('Error_vs_NumNodes.jpg',bbox_inches='tight', dpi=300)
 plt.show()
 
-print("Optimal depth of tree: 9 , The tree starts overfits maximum at 20 height (overfitting gradually states after 13)")
 
 # #### We can clearly see the optimal depth of the tree should be around 9 but our present tree has depth 20 which leads to overfitting. The train error has reduced significantly but the tree fails to generalize well on unseen data. Thus, Post-pruning is required.
 
@@ -473,7 +475,7 @@ X = dataset_test.iloc[:,:-1].values
 y = dataset_test.iloc[:,-1].values.reshape(-1,1)
 dataset = np.concatenate((X, y), axis=1)
 
-
+print("The tree overfits at height: ",find_height(regress_tree.root))
 print("Error before pruning: ",mean_error(y_original,data_test_y,data_test_x.shape[0]))
 print("Number of nodes before pruning: ",num_nodes(regress_tree.root))
 
