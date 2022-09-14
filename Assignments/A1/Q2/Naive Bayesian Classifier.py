@@ -65,7 +65,7 @@ plt.savefig('Q2/heatmap.jpg',bbox_inches='tight', dpi=300)
 ########################################################################
 
 # Read the CSV file in the from of a dataframe
-data = pd.read_csv("Q2/Train_B_Bayesian.csv")
+data = pd.read_csv("Train_B_Bayesian.csv")
 
 df = data
 

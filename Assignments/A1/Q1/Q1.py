@@ -12,7 +12,6 @@ import seaborn as sns
 import sys
 
 
-
 # #### Read the CSV file in the from of a dataframe
 # 
 
@@ -22,12 +21,13 @@ data = pd.read_csv("Train_B_Tree.csv")
 print("few entries of data: \n",data.head())
 print("Shape of data is: ",data.shape)
 
-# #### Check for duplicate data. Duplicate data doesn't help in training and so needs to be dropped.
+# #### Check for duplicate data. Duplicate data doesn't help in training and so ideally needs to be analysed.
 
 print("Duplicate data entries: \n",data[data.duplicated()==True])
 data = data.drop_duplicates(keep='first')
 print("After removing duplicate data, data shape is: ",data.shape)
 
+#basic details of the data
 print("\nBasic info about data: \n")
 print("\n")
 print(data.info())
@@ -48,7 +48,6 @@ print("Output Label dimension: ",y.shape)
 
 # #### To visualise the kernel density (peaks in the data) of the individual features and to visualise the distributions' median, 25 percentile and 75 percentile quartiles
 
-
 data_vis = (X - X.mean()) / (X.std())              # standardization of data so that the data lies in the range [-1,1]
 data_vis = pd.concat([y,data_vis],axis=1)
 data_vis = pd.melt(data_vis,id_vars="csMPa",var_name="features",value_name='value')
@@ -57,6 +56,7 @@ print("Violin Plot of the data: ")
 plt.figure(figsize=(10,10))
 sns.violinplot(x="features", y="value", data=data_vis, inner="quart")#violinplot represents the distribution pattern of each of the features
 plt.xticks(rotation=45);
+plt.title("Violin Plot");
 plt.savefig('Violin_Plot.jpg',bbox_inches='tight', dpi=300)
 plt.show()
 
@@ -64,18 +64,20 @@ print("Box plot of the data: ")
 plt.figure(figsize=(10,10))
 sns.boxplot(x="features", y="value", data=data_vis)
 plt.xticks(rotation=45);
+plt.title("Box Plot");
 plt.savefig('Box_Plot.jpg',bbox_inches='tight', dpi=300)
 plt.show()
 
 # #### To visualize individual  features' kernel density and pairwise scatter plots to look for correlation between different features.
 
-print("Kernel density and scatter plot of the data: ")
+#print("Kernel density and scatter plot of the data: ")
 plt.figure(figsize=(25,25))
 sns.set(style="white")
 df = X.loc[:,['cement','slag','flyash','water','superplasticizer','coarseaggregate','fineaggregate','age']]
 g = sns.PairGrid(df, diag_sharey=False,corner=True);
 g.map_lower(sns.regplot,scatter_kws={"color": "red"}, line_kws={"color": "black"});
 g.map_diag(sns.kdeplot, lw=3);
+plt.title("Kernel and Scatter Plot");
 plt.savefig('Kernel_Scatter_Plot.jpg',bbox_inches='tight', dpi=300)
 plt.show()
 
@@ -83,7 +85,7 @@ plt.show()
 print("Heatmap of the data: ")
 f,ax = plt.subplots(figsize=(11, 11))
 sns.heatmap(df.corr(), annot=True, linewidths=.5, fmt= '.1f',ax=ax);
-
+plt.title("Heat Map");
 plt.savefig('HeatMap.jpg',bbox_inches='tight', dpi=300)
 plt.show()
 
@@ -108,12 +110,12 @@ class Node():
     def __init__(self, attribute=None, threshold=None, child_left=None, child_right=None, variance_red=None, level = 0, leaf_value=None):
         
         # data members corresponding to decision nodes
-        self.attribute = attribute
-        self.threshold = threshold
-        self.child_left = child_left
-        self.child_right = child_right
-        self.variance_red = variance_red
-        self.level = level
+        self.attribute = attribute          #splitting attribute
+        self.threshold = threshold          #threshold value of the splitting attribute
+        self.child_left = child_left        #left child of the node
+        self.child_right = child_right      #right child of the node
+        self.variance_red = variance_red    #reduction in variance caused by splitting
+        self.level = level                  #level of the node from top
         
         #data member corresponding to a leaf node
         self.leaf_value = leaf_value
@@ -447,18 +449,7 @@ plt.legend(['Train','Test']);
 plt.savefig('Error_vs_NumNodes.jpg',bbox_inches='tight', dpi=300)
 plt.show()
 
-print("Optimal depth of tree: 9 ")
-fig = plt.figure(figsize = (8,10))
-x = [i for i in range(1,21)] # plot how test and training error vary with depth of the tree
-plt.plot(x,train);
-plt.plot(x,test);
-plt.plot(np.full((30,1),9),np.arange(0,30))
-plt.xlabel("Depth");
-plt.ylabel("Mean Squared Error");
-plt.title("Error vs Depth");
-plt.legend(['Train','Test','Optimal Depth']);
-plt.savefig('Optimal_depth.jpg',bbox_inches='tight', dpi=300)
-plt.show()
+print("Optimal depth of tree: 9 , The tree starts overfits maximum at 20 height (overfitting gradually states after 13)")
 
 # #### We can clearly see the optimal depth of the tree should be around 9 but our present tree has depth 20 which leads to overfitting. The train error has reduced significantly but the tree fails to generalize well on unseen data. Thus, Post-pruning is required.
 
@@ -467,7 +458,6 @@ regress_tree.fit_model(data_train_x,data_train_y)#train a tree
         
 y_original = [regress_tree.predict(x,regress_tree.root) for x in data_test_x] #calculate test error
 err = mean_error(y_original,data_test_y,data_test_x.shape[0])
-
 
 print('The Regression Decision Tree is now available in decision_tree.txt')
 
@@ -501,7 +491,6 @@ optimal_tree.fit_model_depth(data_train_x,data_train_y)
 print("Optimal number of nodes: ",num_nodes(optimal_tree.root))
 
 
-
 print("Variation of Number of nodes with during pruning: ")
 nodes=[d[0]['num']] 
 err=[d[0]['error']]
@@ -513,6 +502,7 @@ plt.plot(nodes,err);
 plt.xlabel("Number of Nodes");
 plt.ylabel("Error");
 plt.title("Variation of Error vs Node during pruning");
+plt.savefig('Error_vs_nodes_pruning.jpg',bbox_inches='tight', dpi=300)
 plt.show()
 
 
