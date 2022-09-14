@@ -64,7 +64,7 @@ def EDA():
 ########################################################################
 
 # Calling EDA function, to generate various graphical plots, so that we can get an idea of the data
-# EDA()
+EDA()
 # Read the CSV file in the from of a dataframe
 data = pd.read_csv("Train_B_Bayesian.csv")
 
