@@ -68,9 +68,9 @@ plt.xticks(rotation=45);
 
 plt.figure(figsize=(25,25))
 sns.set(style="white")
-g = sns.PairGrid(eda_x, diag_sharey=False,corner=True);
-g.map_lower(sns.regplot,scatter_kws={"color": "red"}, line_kws={"color": "black"});
-g.map_diag(sns.kdeplot, lw=3);
+g = sns.PairGrid(eda_x, diag_sharey=False,corner=True)
+g.map_lower(sns.regplot,scatter_kws={"color": "red"}, line_kws={"color": "black"})
+g.map_diag(sns.kdeplot, lw=3)
 
 
 
