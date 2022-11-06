@@ -124,7 +124,7 @@ print("\nSVM with radial basis function kernel: ",np.sum(y_pred == d_test_y.asty
 
 # ## MLP with 16 nodes hidden layers
 print("\nMLP Classifer with one hidden layer of 16 nodes.........")
-model_1 = neural_network.MLPClassifier(hidden_layer_sizes =(16),solver='sgd',batch_size=32, alpha = 0.001,max_iter=2000,shuffle=False,random_state=2 )
+model_1 = neural_network.MLPClassifier(hidden_layer_sizes =(16),solver='sgd',batch_size=32, learning_rate_init = 0.001,max_iter=4000,shuffle=False,random_state=2 )
 model_1.fit(d_train_x,d_train_y)
 y_pred_one_layer = model_1.predict(d_test_x)
 print("\nAccuracy of One 16 node hidden layer MLP Classifier: ",np.sum(y_pred_one_layer == d_test_y.astype("int"))/d_test_y.shape)
@@ -133,7 +133,7 @@ accuracy_1 = np.sum(y_pred_one_layer == d_test_y.astype("int"))/d_test_y.shape
 
 # ## MLP with 256,16 nodes hidden layers
 print("\nMLP Classifer with two hidden layer of 256 and 16 nodes.........")
-model_2 = neural_network.MLPClassifier(hidden_layer_sizes =(256,16),solver='sgd',batch_size=32, alpha = 0.001,max_iter=2000,shuffle=False,random_state=2 )
+model_2 = neural_network.MLPClassifier(hidden_layer_sizes =(256,16),solver='sgd',batch_size=32, learning_rate_init = 0.001,max_iter=4000,shuffle=False,random_state=2 )
 model_2.fit(d_train_x,d_train_y)
 y_pred_two_layer = model_2.predict(d_test_x)
 print("\nAccuracy of 256,16 node hidden layer MLP Classifier: ",np.sum(y_pred_two_layer == d_test_y.astype("int"))/d_test_y.shape)
@@ -151,9 +151,9 @@ x=[]
 y = []
 for i in [0.00001,0.0001,0.001,0.01,0.1]:
     if accuracy_1 > accuracy_2:
-        model = neural_network.MLPClassifier(hidden_layer_sizes =(16),solver='sgd',batch_size=32, alpha = i,max_iter=2000 ,shuffle=False,random_state=2)
+        model = neural_network.MLPClassifier(hidden_layer_sizes =(16),solver='sgd',batch_size=32, learning_rate_init = i,max_iter=4000 ,shuffle=False,random_state=2)
     else:
-        model = neural_network.MLPClassifier(hidden_layer_sizes =(256,16),solver='sgd',batch_size=32, alpha = i,max_iter=2000,shuffle=False,random_state=2 )
+        model = neural_network.MLPClassifier(hidden_layer_sizes =(256,16),solver='sgd',batch_size=32, learning_rate_init = i,max_iter=4000,shuffle=False,random_state=2 )
     model.fit(d_train_x,d_train_y)
     y.append([model.n_iter_,model.loss_curve_])
     y_pred = model.predict(d_test_x)
@@ -165,15 +165,18 @@ for i in [0.00001,0.0001,0.001,0.01,0.1]:
 plt.title("Best MLP classifier Error vs number of iterations curve")
 plt.plot(np.arange(1, y[0][0]+1),y[0][1]);
 plt.xlabel("Number of iteration");
-plt.ylabel("Error for learning rate = 0.00001");
+plt.ylabel("Loss curve learning rate = 0.00001");
+plt.savefig("Learning_rate = 0.00001.png",bbox_inches='tight')
 plt.show()
+
 
 
 
 plt.title("Best MLP classifier Error vs number of iterations curve")
 plt.plot(np.arange(1, y[1][0]+1),y[1][1]);
 plt.xlabel("Number of iteration");
-plt.ylabel("Error learning rate = 0.0001");
+plt.ylabel("Loss curve learning rate = 0.0001");
+plt.savefig("Learning_rate = 0.0001.png",bbox_inches='tight')
 plt.show()
 
 
@@ -181,7 +184,8 @@ plt.show()
 plt.title("Best MLP classifier Error vs number of iterations curve")
 plt.plot(np.arange(1, y[2][0]+1),y[2][1]);
 plt.xlabel("Number of iteration");
-plt.ylabel("Error for learning rate = 0.001");
+plt.ylabel("Loss curve learning rate = 0.001");
+plt.savefig("Learning_rate = 0.001.png",bbox_inches='tight')
 plt.show()
 
 
@@ -189,7 +193,8 @@ plt.show()
 plt.title("Best MLP classifier Error vs number of iterations curve")
 plt.plot(np.arange(1, y[3][0]+1),y[3][1]);
 plt.xlabel("Number of iteration");
-plt.ylabel("Error for learning rate = 0.01");
+plt.ylabel("Loss curve learning rate = 0.01");
+plt.savefig("Learning_rate = 0.01.png",bbox_inches='tight')
 plt.show()
 
 
@@ -197,7 +202,8 @@ plt.show()
 plt.title("Best MLP classifier Error vs number of iterations curve")
 plt.plot(np.arange(1, y[4][0]+1),y[4][1]);
 plt.xlabel("Number of iteration");
-plt.ylabel("Error for learning rate = 0.1");
+plt.ylabel("Loss curve learning rate = 0.1");
+plt.savefig("Learning_rate = 0.1.png",bbox_inches='tight')
 plt.show()
 
 
@@ -206,6 +212,7 @@ plt.title("Best MLP classifier Accuracy vs learning rate curve")
 plt.plot(['0.00001','0.0001','0.001','0.01','0.1'],x);
 plt.xlabel("Learning Rate");
 plt.ylabel("Accuracy");
+plt.savefig("Accuracy vs learning_rate.png",bbox_inches='tight')
 plt.show()
 
 

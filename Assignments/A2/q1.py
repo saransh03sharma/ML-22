@@ -58,7 +58,7 @@ plt.show()
 
 
 sns.set_style("whitegrid");
-sns.pairplot(data,hue="Class Label",height=3,palette = ['tab:blue', 'tab:green', 'tab:orange']);
+sns.pairplot(data,hue="Class Label",height=3,palette = ['tab:blue', 'tab:green', 'tab:orange'],corner=True);
 plt.show()
 
 
@@ -75,6 +75,10 @@ pca = PCA(n_components=0.95)
 principalComponents = pca.fit_transform(x)
 print("Dimension of Data after PCA: ",principalComponents.shape)
 print("\n")
+
+d = np.concatenate((principalComponents,y),axis=1)
+df = pd.DataFrame(data = d,columns = ['column_1', 'column_2','output'])
+df.to_csv('PCA_data.csv',index = False);
 
 principalDf = pd.DataFrame(data = principalComponents
               ,columns = ['column_1', 'column_2'])
@@ -147,7 +151,7 @@ def runkMeans(X, cluster_rep, findClosestcluster_rep, computecluster_rep):
 def computeCost(X,cluster_rep,idx):
     sum = 0
     for i in range(X.shape[0]):
-        sum += np.linalg.norm(X[i] - cluster_rep[idx[i]])**2
+        sum += np.sum(np.power(X[i] - cluster_rep[idx[i]],2))**2
     return sum/X.shape[0]
 #the function calculates Jclust 
 
@@ -223,9 +227,6 @@ for K in range(2,9):
     print("\n")
 #run k means for randomly picking k data points as initial cluster representatives
 
-
-
-
 num_row = 7
 num_col = 1
 fig, axes = plt.subplots(num_row, num_col, figsize=(8,32))
@@ -246,33 +247,3 @@ plt.title("NMI vs K")
 plt.plot(range(2,9),nmi)
 plt.show()
 
-# ## PCA with original dataset of 4 features
-y = data["Class Label"].values
-x = data.drop("Class Label",axis = 1).to_numpy()
-print("\nK-Means on original dataset")
-
-
-cluster=[]
-id_x = []
-nmi = []
-for K in range(2,9): 
-    initial_cluster_rep = fromdatainitialise(x, K)
-    cluster_rep, idx,num = runkMeans(x, initial_cluster_rep,findClosestcluster_rep,computecluster_rep)
-    cost = computeCost(x,cluster_rep,idx)
-    
-    mut = mutual(y,idx,K,3)
-    nmi.append(2* (class_entropy(y,3)-mut)/(class_entropy(y,3) + cluster_entropy(idx,K)))
-    print("Normalised Mutual Information for k = ",K," ",nmi[K-2])
-    
-    cluster.append(cluster_rep)
-    id_x.append(idx)
-    print("Final Cost: {0:.10f}".format(cost))
-    print("\n")
-#run k means for randomly picking k data points as initial cluster representatives
-
-
-plt.xlabel("Number of clusters")
-plt.ylabel("NMI Score")
-plt.title("NMI vs K")
-plt.plot(range(2,9),nmi)
-plt.show()
