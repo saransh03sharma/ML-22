@@ -318,7 +318,7 @@ else:
 clf = svm.SVC(kernel='rbf',random_state=42)
 clf.fit(d_train_x, d_train_y)
 y_pred_svm = clf.predict(d_test_x)
-print("\nSVM with quadratic kernel Accuracy: ",np.sum(y_pred_svm == d_test_y.astype("int"))/d_test_y.shape)
+print("\nSVM with radial basis function kernel Accuracy: ",np.sum(y_pred_svm == d_test_y.astype("int"))/d_test_y.shape)
 
 
 #SVM with quadratic kernel

@@ -89,6 +89,7 @@ print("\n")
 
 
 sns.scatterplot(x = principalDf["column_1"],y = principalDf["column_2"],hue=data["Class Label"],palette=['green','orange','red']);
+plt.title("PCA Graph")
 plt.show()
 
 data.loc[data['Class Label']=="Iris-setosa","Class Label"]=0
