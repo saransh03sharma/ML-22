@@ -247,3 +247,4 @@ plt.title("NMI vs K")
 plt.plot(range(2,9),nmi)
 plt.show()
 
+print("Maximum NMI is corresponding to k = ",nmi.index(max(nmi))+2)

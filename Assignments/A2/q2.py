@@ -227,7 +227,7 @@ else:
 
 
 
-print("\nFollowing is the best variabt of MLP classifier: ")
+print("\nFollowing is the best variant of MLP classifier: ")
 print(model)
 
 
@@ -306,7 +306,7 @@ d_test_y = d_test.iloc[:,-1].values#set test data output label
 d_train_y = d_train_y.astype("int")
 d_test_y = d_test_y.astype("int")
 
-
+#chose the best MLP model from part 3
 if accuracy_1> accuracy_2:
     model = model_1
     accuracy = accuracy_1
